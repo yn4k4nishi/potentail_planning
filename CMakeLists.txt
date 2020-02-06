@@ -20,7 +20,7 @@ include_directories(
 add_executable(potential_planning
         src/main.cpp
         include/matplotlibcpp.h
-        )
+        include/object.h)
 
 target_include_directories(potential_planning PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(potential_planning ${PYTHON_LIBRARIES})
