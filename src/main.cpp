@@ -52,15 +52,11 @@ int main(){
 
     plt::plot_surface(x, y, z);
     plt::show();
+//    plt::save("potential.png");
 
     Machine machine(Eigen::Vector2f(0.1,0.1),0.1);
     std::vector<float> x_plot,y_plot;
-    int cnt = 0;
     while(g.getDistance(machine.getPose()) > 0.5){
-//        std::cout << "loop ..." << std::endl;
-
-        cnt ++;
-
         std::vector<float> x_obs,y_obs;
         Eigen::Vector2f force(0.0,0.0);
         for (auto &o : objects) {
@@ -74,20 +70,18 @@ int main(){
         x_plot.push_back(machine.getPose().x());
         y_plot.push_back(machine.getPose().y());
 
-//        if(cnt % 10 == 0) {
-            plt::clf();
-            plt::plot(x_plot, y_plot);
-            plt::scatter(x_obs,y_obs);
-            plt::xlim(-1, 11);
-            plt::ylim(-1, 11);
+        plt::clf();
+        plt::plot(x_plot, y_plot);
+        plt::scatter(x_obs,y_obs);
+        plt::xlim(-1, 11);
+        plt::ylim(-1, 11);
 
-            plt::title("potential planning figure");
-            plt::pause(0.1);
-
-//            cnt = 0;
-//        }
+        plt::title("potential planning figure");
+        plt::pause(0.1);
 
     }
+
+//    plt::save("potential_planning_figure.png");
 
     return 0;
 }
