@@ -19,13 +19,17 @@ public:
     // ポテンシャルを返す
     virtual float potential(const Eigen::Vector2f pos) = 0;
 
+    virtual float getDistance(const Eigen::Vector2f pos) = 0;
+
+    virtual Eigen::Vector2f getPose() = 0;
+
 };
 
 /*** Start Point ***/
 class StartPoint : public ObjectBase {
 private:
     Eigen::Vector2f pose;
-    static constexpr float A = 10.0f;
+    static constexpr float A = 1000.0f;
 public:
     StartPoint(float x, float y):pose(x,y){}
     ~StartPoint(){}
@@ -36,7 +40,7 @@ public:
          *  |F| = | A / r^2 |
          *  クーロン力の式と同様
          */
-        return A / (this->pose - pos).squaredNorm() * (this->pose - pos).normalized();
+        return A / (this->pose - pos).squaredNorm() * (pos - this->pose).normalized();
     };
 
     // ポテンシャルを返す
@@ -45,7 +49,15 @@ public:
          *  |F| = | A / r |
          *  クーロンポテンシャルの式と同様
          */
-        return A / (this->pose - pos).norm();
+        return A / (pos - this->pose).norm();
+    };
+
+    float getDistance(const Eigen::Vector2f pos){
+        return (this->pose - pos).norm();
+    };
+
+    Eigen::Vector2f getPose(){
+        return this->pose;
     };
 };
 
@@ -53,7 +65,8 @@ public:
 class GoalPoint : public ObjectBase {
 private:
     Eigen::Vector2f pose;
-    static constexpr float A = -10.0f;
+    static constexpr float A = -5000.0f;
+    static constexpr float R_0 = 1.0f;
 public:
     GoalPoint(float x, float y):pose(x,y){}
     ~GoalPoint(){}
@@ -61,19 +74,27 @@ public:
     // 斥力を返す
     Eigen::Vector2f repulsive(const Eigen::Vector2f pos){
         /*
-         *  |F| = | A / r^2 |
+         *  |F| = | A / (r- r_0)^2 |
          *  クーロン力の式と同様
          */
-        return A / (this->pose - pos).squaredNorm() * (this->pose - pos).normalized();
+        return A / pow(this->getDistance(pos),2) * (pos - this->pose).normalized();
     };
 
     // ポテンシャルを返す
     float potential(const Eigen::Vector2f pos){
         /*
-         *  |F| = | A / r |
+         *  |F| = | A / (r - r_0) |
          *  クーロンポテンシャルの式と同様
          */
-        return A / (this->pose - pos).norm();
+        return A / this->getDistance(pos);
+    };
+
+    float getDistance(const Eigen::Vector2f pos){
+        return (this->pose - pos).norm();
+    };
+
+    Eigen::Vector2f getPose(){
+        return this->pose;
     };
 };
 
@@ -81,7 +102,7 @@ public:
 class Obstacle : public ObjectBase {
 private:
     Eigen::Vector2f pose;
-    static constexpr float A = 3.0f;
+    static constexpr float A = 3000.0f;
 public:
     Obstacle(float x, float y):pose(x,y){}
     ~Obstacle(){}
@@ -92,7 +113,7 @@ public:
          *  |F| = | A / r^2 |
          *  クーロン力の式と同様
          */
-        return A / (this->pose - pos).squaredNorm() * (this->pose - pos).normalized();
+        return A / (this->pose - pos).squaredNorm() * (pos - this->pose).normalized();
     };
 
     // ポテンシャルを返す
@@ -102,6 +123,14 @@ public:
          *  クーロンポテンシャルの式と同様
          */
         return A / (this->pose - pos).norm();
+    };
+
+    float getDistance(const Eigen::Vector2f pos){
+        return (this->pose - pos).norm();
+    };
+
+    Eigen::Vector2f getPose(){
+        return this->pose;
     };
 };
 
